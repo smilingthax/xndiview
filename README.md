@@ -17,6 +17,11 @@ Usage:
   -f: Fullscreen
 ```
 
+Known issues:
+- Keyboard handling uses keycode directly instead of using (e.g.) xkbcommon to map it first to keysym.
+- Does not support other visuals than TrueColor 24bpp with "BGRX" layout (red_mask = 0xff0000, green_mask = 0x00ff00, blue_mask = 0x0000ff).
+- No support for alpha / indication of transparency.
+
 Copyright (c) 2021 Tobias Hoffmann
 
 License: https://opensource.org/licenses/MIT
