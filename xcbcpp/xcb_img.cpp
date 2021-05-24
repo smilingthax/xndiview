@@ -24,7 +24,9 @@ struct fd_array {
     }
   }
 
-//  size_t size() const { return len; }
+  size_t size() const {
+    return len;
+  }
 
   fd_array &operator=(const fd_array &) = delete;
 
@@ -148,7 +150,7 @@ XcbImage::ShmSegment::ShmSegment(XcbConnection &conn)
   const xcb_query_extension_reply_t *ext = xcb_get_extension_data(conn, &xcb_shm_id); // (cached, compared to raw xcb_query_extension())
   if (!ext || !ext->present) {
     // fprintf(stderr, "MIT-SHM extension not present. (%p)\n", ext);
-    return;
+    return;  // TODO? option: fail when shm is not available?
   }
 
   XcbFuture<xcb_shm_query_version_request_t> ver(conn);
@@ -219,7 +221,8 @@ bool XcbImage::ShmSegment::reset(size_t size)
     detail::fd_array fds{xcb_shm_create_segment_reply_fds(conn, reply), reply->nfd};
     ::free(reply);
 
-    if (!fds || reply->nfd != 1) {
+    if (!fds || fds.size() != 1) {
+      // fprintf(stderr, "Unexpected: Successful shm_create_segment did not return single fd\n");
       return false;
     }
 
@@ -238,7 +241,7 @@ bool XcbImage::ShmSegment::reset(size_t size)
     return true;
   }
 #endif
-  // fprintf(stderr, "fallback to non-create_segment shm\n");  // TODO? option: fail when shm is not available?
+  // fprintf(stderr, "fallback to non-create_segment shm\n");
 
   const int id = shmget(IPC_PRIVATE, size, IPC_CREAT | 0600);
   if (id == -1) {

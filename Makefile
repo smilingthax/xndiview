@@ -46,7 +46,6 @@ clean:
 	$(RM) $(OBJECTS) $(DEPENDS) $(EXEC)
 	$(MAKE) -C libyuv/ clean
 
- # $(OBJ_CPP): %.o: ../%.cpp
 %.d: xcbcpp/%.cpp
 	@$(CC) $(CPPFLAGS) -MM -MT"$@" -MT"$*.o" -o $@ $<  2> /dev/null
 
