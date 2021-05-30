@@ -127,9 +127,9 @@ struct XcbDemux : XcbEventCallbacks {
   }
 
   MAKE_ONFN(key_press, KEY_PRESS, xcb_window_t, event);
-  MAKE_ONFN(key_release, KEY_PRESS, xcb_window_t, event);
+  MAKE_ONFN(key_release, KEY_RELEASE, xcb_window_t, event);
   MAKE_ONFN(button_press, BUTTON_PRESS, xcb_window_t, event);
-  MAKE_ONFN(button_release, BUTTON_PRESS, xcb_window_t, event);
+  MAKE_ONFN(button_release, BUTTON_RELEASE, xcb_window_t, event);
   MAKE_ONFN(motion_notify, MOTION_NOTIFY, xcb_window_t, event);
   MAKE_ONFN(enter_notify, ENTER_NOTIFY, xcb_window_t, event);
   MAKE_ONFN(leave_notify, LEAVE_NOTIFY, xcb_window_t, event);
