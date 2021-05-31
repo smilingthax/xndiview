@@ -14,9 +14,10 @@ enum SignalFlags {
 
 namespace detail {
 
+// NOTE: actually not needed for Root, but this is the only possible non-templated base type; Node and Root also need a common prev/next Base...
 struct SignalConnectionBase {
   virtual ~SignalConnectionBase();
-  virtual void remove_node() = 0;
+  virtual void remove_node(SignalConnectionBase *root) = 0; // actually SignalListBase<...???...> *
 
   ::Connection *conns = {};
 };
@@ -35,10 +36,12 @@ struct SignalListBase<Ret(Args...)> : SignalConnectionBase {
     next.swap(node);
   }
 
-  void remove_node() override {
+  void remove_node(SignalConnectionBase *root) override {
     // assert(prev);
     if (next) {
       next->prev = prev;
+    } else {
+      static_cast<SignalListBase *>(root)->prev = prev;
     }
 
     std::unique_ptr<SignalListBase> tmp = std::move(next);
@@ -119,7 +122,7 @@ struct SignalListRoot<Ret(Args...), void> : SignalListBase<Ret(Args...)> {
   Ret operator()(Args...) override {
     throw 0;
   }
-  void remove_node() override {
+  void remove_node(SignalConnectionBase *root) override {
     throw 0;
   }
 //  using base_t::setNext;
@@ -161,7 +164,7 @@ struct reduce_use_last<void> : reduce_void { };
 
 struct Connection final {
   Connection()
-    : node(), prev(), next()
+    : node(), root(), prev(), next()
   { }
 
   ~Connection() {
@@ -179,9 +182,13 @@ struct Connection final {
 
 //  Connection &operator=(const Connection &rhs) = delete;
   Connection &operator=(Connection &&rhs) {
-    disconnect();
+    if (node) {
+      unlink();
+      node = nullptr; // "just in case"
+    }
 
     node = move(rhs.node);
+    root = move(rhs.root);
     prev = move(rhs.prev);
     next = move(rhs.next);
 
@@ -198,7 +205,7 @@ struct Connection final {
   void disconnect() {
     if (node) {
       unlink();
-      node->remove_node();
+      node->remove_node(root);
       node = nullptr;
     }
   }
@@ -212,9 +219,12 @@ private:
   friend class Signal;
   friend struct detail::SignalConnectionBase;
 
-  Connection(detail::SignalConnectionBase *node)
-    : node(node), prev(&node->conns), next(node->conns) {
+  Connection(detail::SignalConnectionBase *node, detail::SignalConnectionBase *root)
+    : node(node), root(root), prev(&node->conns), next(node->conns) {
     node->conns = this;
+    if (next) {
+      *next->prev = this;
+    }
   }
 
   void unlink() {
@@ -232,7 +242,7 @@ private:
     return ret;
   }
 
-  detail::SignalConnectionBase *node;
+  detail::SignalConnectionBase *node, *root;
   Connection **prev, *next;
 };
 
@@ -282,7 +292,7 @@ public:
       root.prev = node;
     }
     root.next.reset(node);
-    return {node};
+    return {node, &root};
   }
 
   template <typename Fn>
@@ -298,7 +308,7 @@ public:
       node->prev = &root;
     }
     root.prev = node;
-    return {node};
+    return {node, &root};
   }
 
   template <typename Fn>
@@ -314,7 +324,7 @@ public:
       const detail::reduce_result_t res = ret((*node)(args...));
       if (res == detail::reduce_result_t::REMOVE_HANDLER || node->once) {
         node = node->prev;
-        node->next->remove_node();
+        node->next->remove_node(&root);
       }
       if (res == detail::reduce_result_t::STOP) {
         return ret.get();
@@ -330,7 +340,7 @@ public:
       (*node)(args...);
       if (node->once) {
         node = node->prev;
-        node->next->remove_node();
+        node->next->remove_node(&root);
       }
     }
   }
