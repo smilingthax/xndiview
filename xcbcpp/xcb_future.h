@@ -37,7 +37,7 @@ public:
     // assert(error);
     const int code = error->error_code;
     free(error);
-    throw XcbEventError(std::string("XcbFuture<") + Trait::name + "> error", code);
+    throw XcbGenericError(std::string("XcbFuture<") + Trait::name + "> error", code);
   }
 
 private:

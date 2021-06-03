@@ -17,9 +17,9 @@ struct XcbConnectionError : XcbError {
 };
 
 
-struct XcbEventError : XcbError {
-  XcbEventError(int code);
-  XcbEventError(const std::string &prefix, int code);
+struct XcbGenericError : XcbError {
+  XcbGenericError(int code);
+  XcbGenericError(const std::string &prefix, int code);
 
   static const char *get_error_string(int code);
 };
@@ -71,7 +71,7 @@ struct XcbConnection final {
     while (auto ev = unique_xcb_generic_event_t{xcb_poll_for_event(conn)}) {
       if (ev->response_type == 0) {
         auto code = ((xcb_generic_error_t *)ev.get())->error_code;
-        throw XcbEventError(code);
+        throw XcbGenericError(code);
       } else if (!fn(ev.get())) {
         return false;
       }

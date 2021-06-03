@@ -111,7 +111,7 @@ void XcbImage::put(xcb_drawable_t drawable, int16_t dst_x, int16_t dst_y)
     // also waits for server to finish op
     unique_xcb_generic_error_t error{xcb_request_check(shm.conn, ck)};
     if (error) {
-      throw XcbEventError(error->error_code);  // TODO? just return false?
+      throw XcbGenericError(error->error_code);  // TODO? just return false?
     }
 
   } else if (!buf.empty()) {
@@ -135,7 +135,7 @@ void XcbImage::put(xcb_drawable_t drawable, int16_t dst_x, int16_t dst_y)
     for (size_t i = 0; i < num_stripes; i++) {
       unique_xcb_generic_error_t error{xcb_request_check(shm.conn, ckcache[i])};
       if (error) {
-        throw XcbEventError(error->error_code);
+        throw XcbGenericError(error->error_code);
       }
     }
 
