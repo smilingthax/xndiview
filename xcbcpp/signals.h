@@ -28,6 +28,7 @@ struct SignalListBase;
 template <typename Ret, typename... Args>
 struct SignalListBase<Ret(Args...)> : SignalConnectionBase {
   SignalListBase() = default;
+  SignalListBase(bool once) : once(once) { }
   SignalListBase(SignalListBase &&) = delete;  // TODO?
 
   virtual Ret operator()(Args...) = 0;
@@ -59,9 +60,9 @@ struct SignalListNode;
 
 template <typename Ret, typename... Args, typename Fn>
 struct SignalListNode<Ret(Args...), Fn> final : SignalListBase<Ret(Args...)> {
-  SignalListNode(Fn&& fn, bool _once) : fn((Fn&&)fn) {
-    SignalListBase<Ret(Args...)>::once = _once;
-  }
+  SignalListNode(Fn&& fn, bool once)
+    : SignalListBase<Ret(Args...)>(once), fn((Fn&&)fn)
+  { }
 
   Ret operator()(Args... args) override {
     return fn(args...);
@@ -72,9 +73,9 @@ struct SignalListNode<Ret(Args...), Fn> final : SignalListBase<Ret(Args...)> {
 
 template <typename... Args, typename Fn>
 struct SignalListNode<void(Args...), Fn> final : SignalListBase<void(Args...)> {
-  SignalListNode(Fn&& fn, bool _once) : fn((Fn&&)fn) {
-    SignalListBase<void(Args...)>::once = _once;
-  }
+  SignalListNode(Fn&& fn, bool once)
+    : SignalListBase<void(Args...)>(once), fn((Fn&&)fn)
+  { }
 
   void operator()(Args... args) override {
     fn(args...);
@@ -292,6 +293,7 @@ public:
       root.prev = node;
     }
     root.next.reset(node);
+    node->prev = &root;
     return {node, &root};
   }
 
