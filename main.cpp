@@ -108,11 +108,12 @@ int main(int argc, char **argv)
        opt_list = false,
        opt_tally_pvw = false, opt_tally_pgm = false,
        opt_gray = false,
-       opt_fullscreen = false;
+       opt_fullscreen = false,
+       opt_ipsrc = false;
   const char *opt_src = NULL;
 
   int opt;
-  while ((opt = getopt(argc, argv, "lhpmvgf")) != -1) {
+  while ((opt = getopt(argc, argv, "lhpmvgfi")) != -1) {
     switch (opt) {
     case 'l': opt_list = true; break;
     case 'p': opt_tally_pvw = true; break;
@@ -120,6 +121,7 @@ int main(int argc, char **argv)
     case 'v': opt_verbose = true; break;
     case 'g': opt_gray = true; break;
     case 'f': opt_fullscreen = true; break;
+    case 'i': opt_ipsrc = true; break;
     default:
       fprintf(stderr, "Bad argument: %c\n", opt);
     case 'h':
@@ -137,7 +139,7 @@ int main(int argc, char **argv)
   }
 
   if (opt_usage) {
-    fprintf(stderr, "Usage: %s [-l | -h | [-pmvgf] ndi_source]\n", argv[0]);
+    fprintf(stderr, "Usage: %s [-l | -h | [-pmvgfi] ndi_source]\n", argv[0]);
     return 1;
   }
 
@@ -154,7 +156,7 @@ int main(int argc, char **argv)
     }
 
     NDIlib_recv_create_v3_t rcvt(
-      opt_src,
+      { (opt_ipsrc ? NULL : opt_src), (opt_ipsrc ? opt_src : NULL) },
       NDIlib_recv_color_format_BGRX_BGRA  // (CAVE: linux: RGBX_RGBA is buggy)
 //      , NDIlib_recv_bandwidth_highest
 //      , false // allow_video_fields_

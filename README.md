@@ -15,6 +15,7 @@ Usage:
   -v: Verbose
   -g: Gray background
   -f: Fullscreen
+  -i: Treat ndi_source as ip:port
 ```
 
 Known issues:
