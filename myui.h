@@ -26,6 +26,11 @@ public:
     ewmh.fullscreen(win.get_window(), val);
   }
 
+  void show_transparency(bool val) {
+    transparency = val;
+    do_draw(false);
+  }
+
   void close() { // TODO?
     win.unmap();
   }
@@ -42,6 +47,8 @@ private:
   XcbImage img;
   void init_image();
   uint16_t img_width, img_height;
+
+  bool transparency = false;
 
   struct {
     const uint8_t *data;

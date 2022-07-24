@@ -119,6 +119,27 @@ void MyUI::do_draw(bool clear)
     libyuv::kFilterBilinear);
   assert(res == 0);
 
+  if (transparency) { // TODO/FIXME: SSSE3, AVX2, NEON, ... version ? ...  // TODO? elsewhere ?
+    // + pre-multiplies (Attenuate)
+    uint8_t *row = dst;
+    for (int y = 0; y < fit.dh; y++) {
+      uint8_t *rgba = row;
+      for (int x = 0; x < fit.dw; x++) {
+        if (rgba[3] == 0xff) {
+          continue;
+        }
+        const float alpha = rgba[3] / 255.0f,
+                    ialpha = 1.0f - alpha;
+        const uint8_t bgcol = ((x / 8 + y / 8) & 1) ? 0xbb : 0xff;
+        rgba[0] = (uint8_t)(rgba[0] * alpha + bgcol * ialpha);  // TODO? clamp ?
+        rgba[1] = (uint8_t)(rgba[1] * alpha + bgcol * ialpha);
+        rgba[2] = (uint8_t)(rgba[2] * alpha + bgcol * ialpha);
+        rgba += 4;
+      }
+      row += img.stride();
+    }
+  }
+
   if (clear) {
 #if 0
     xcb_rectangle_t r = {0, 0, img_width, img_height};

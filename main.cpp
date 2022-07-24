@@ -109,11 +109,12 @@ int main(int argc, char **argv)
        opt_tally_pvw = false, opt_tally_pgm = false,
        opt_gray = false,
        opt_fullscreen = false,
-       opt_ipsrc = false;
+       opt_ipsrc = false,
+       opt_transparency = false;
   const char *opt_src = NULL;
 
   int opt;
-  while ((opt = getopt(argc, argv, "lhpmvgfi")) != -1) {
+  while ((opt = getopt(argc, argv, "lhpmvgfit")) != -1) {
     switch (opt) {
     case 'l': opt_list = true; break;
     case 'p': opt_tally_pvw = true; break;
@@ -122,6 +123,7 @@ int main(int argc, char **argv)
     case 'g': opt_gray = true; break;
     case 'f': opt_fullscreen = true; break;
     case 'i': opt_ipsrc = true; break;
+    case 't': opt_transparency = true; break;
     default:
       fprintf(stderr, "Bad argument: %c\n", opt);
     case 'h':
@@ -139,15 +141,16 @@ int main(int argc, char **argv)
   }
 
   if (opt_usage) {
-    fprintf(stderr, "Usage: %s [-l | -h | [-pmvgfi] ndi_source]\n"
+    fprintf(stderr, "Usage: %s [-l | -h | [-pmvgfit] ndi_source]\n"
                     "  -l  List\n"
                     "  -h  Help\n"
                     "  -p  Send Preview Tally\n"
                     "  -m  Send Program Tally\n"
                     "  -v  Verbose\n"
-                    "  -g  Gray background\n"
+                    "  -g  Gray letterbox background\n"
                     "  -f  Fullscreen\n"
-                    "  -i  Treat ndi_source as ip address instead of ndi name\n",
+                    "  -i  Treat ndi_source as ip address instead of ndi name\n"
+                    "  -t  Show transparency\n",
                     argv[0]);
     return 1;
   }
@@ -162,6 +165,10 @@ int main(int argc, char **argv)
 
     if (opt_fullscreen) {
       ui.fullscreen(opt_fullscreen);
+    }
+
+    if (opt_transparency) {
+      ui.show_transparency(opt_transparency);
     }
 
     NDIlib_recv_create_v3_t rcvt(
