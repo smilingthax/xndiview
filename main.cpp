@@ -141,15 +141,15 @@ int main(int argc, char **argv)
   }
 
   if (opt_usage) {
-    fprintf(stderr, "Usage: %s [-l | -h | [-pmvgfit] ndi_source]\n"
-                    "  -l  List\n"
-                    "  -h  Help\n"
+    fprintf(stderr, "Usage: %s [-l | -h | [-pmvgfity] ndi_source]\n"
+                    "  -l  List available sources\n"
+                    "  -h  Help\n\n"
                     "  -p  Send Preview Tally\n"
                     "  -m  Send Program Tally\n"
                     "  -v  Verbose\n"
                     "  -g  Gray letterbox background\n"
                     "  -f  Fullscreen\n"
-                    "  -i  Treat ndi_source as ip address instead of ndi name\n"
+                    "  -i  Treat ndi_source as ip:port instead of ndi name\n"
                     "  -t  Show transparency\n",
                     argv[0]);
     return 1;

@@ -6,16 +6,19 @@
 
 Usage:
 ```
-  xndiview [-l | -h | [-pmvgf] ndi_source]
+  xndiview [-l | -h | [-pmvgfit] ndi_source]
 
-  -l: List available sources
+  -l  List available sources
+  -h  Help
 
-  -p: Send PVW tally
-  -m: Send PGM tally
-  -v: Verbose
-  -g: Gray background
-  -f: Fullscreen
-  -i: Treat ndi_source as ip:port
+  -p  Send Preview Tally
+  -m  Send Program Tally
+  -v  Verbose
+  -g  Gray letterbox background
+  -f  Fullscreen
+  -i  Treat ndi_source as ip:port instead of ndi name
+  -t  Show transparency
+
 ```
 
 Known issues:
@@ -23,7 +26,7 @@ Known issues:
 - Does not support other visuals than TrueColor 24bpp with "BGRX" layout (red_mask = 0xff0000, green_mask = 0x00ff00, blue_mask = 0x0000ff).
 - No support for alpha / indication of transparency.
 
-Copyright (c) 2021 Tobias Hoffmann
+Copyright (c) 2022 Tobias Hoffmann
 
 License: https://opensource.org/licenses/MIT
 
