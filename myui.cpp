@@ -126,6 +126,7 @@ void MyUI::do_draw(bool clear)
       uint8_t *rgba = row;
       for (int x = 0; x < fit.dw; x++) {
         if (rgba[3] == 0xff) {
+          rgba += 4;
           continue;
         }
         const float alpha = rgba[3] / 255.0f,
